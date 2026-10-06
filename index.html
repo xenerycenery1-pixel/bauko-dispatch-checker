@@ -38,15 +38,17 @@ main{max-width:none;padding:10px;gap:10px}main>*,.g2>*,.g3>*{min-width:0}body{fo
 .g3{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}.g2{gap:10px}
 @media(max-width:1250px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:860px){.g3{grid-template-columns:1fr}header{padding:8px 12px}}
 .sc{max-height:min(320px,42vh)}.tw{max-height:min(640px,70vh)}.m{padding:8px 12px}.m div{font-size:clamp(20px,2.3vw,30px)}.met{grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px}
+.spx{display:inline-block;border:1px solid var(--bd);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--mu);max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.spx.on{color:var(--ok);border-color:var(--ok)}.spx.busy{color:var(--inf);border-color:var(--inf)}.spx.bad{color:var(--bad);border-color:var(--bad)}
 .card{padding:12px}th,td{padding:5px 8px}#chips{display:flex;flex-wrap:wrap;gap:4px}.chip{margin-left:0}
 </style></head><body>
-<header><h1>BAUKO DISPATCH CHECKER</h1><nav><button class="btn sm" data-tab="check">Dispatch Check</button> <button class="btn sm s" data-tab="rt">Rider Towns</button></nav><div id="chips"></div></header>
+<header><h1>BAUKO DISPATCH CHECKER</h1><nav><button class="btn sm" data-tab="check">Dispatch Check</button> <button class="btn sm s" data-tab="rt">Rider Towns</button></nav><span id="spxStatus" class="spx" role="status" aria-live="polite">SPX Bridge: CONNECTING...</span><div id="chips"></div></header>
 <main><div id="tc" style="display:grid;gap:14px">
 <div class="g2">
 <section class="card"><h2>1 · Dispatch setup</h2>
 <div class="row">
 <label class="f">Dispatch Date<input type="date" id="date"></label>
 <label class="btn">IMPORT INVENTORY<input type="file" id="fInv" accept=".csv,.txt,.xlsx,.xls" hidden></label>
+<button class="btn s" id="spxInv" title="Ask the BAUKO SPX Bridge extension to fetch inventory">IMPORT FROM SPX</button>
 <button class="btn s" id="mInv">Columns</button>
 <button class="btn s" id="clr">Clear all</button></div>
 <div id="invSum" class="mu" style="margin-top:10px">Inventory not loaded. Import the SPX export for LMHub_Received / Assigned / Assigning.</div></section>
@@ -57,6 +59,8 @@ main{max-width:none;padding:10px;gap:10px}main>*,.g2>*,.g3>*{min-width:0}body{fo
 <label class="f">Rider Name<input id="rname" readonly placeholder="—" style="width:200px"></label>
 <label class="f">Expected scope<select id="scope"><option value="towns">Rider's handled towns</option><option value="all">All Bauko Hub inventory</option><option value="rider">Inventory already assigned to this rider</option></select></label>
 <label class="btn">IMPORT DELIVERING DATA<input type="file" id="fDel" accept=".csv,.txt,.xlsx,.xls" hidden></label>
+<button class="btn s" id="spxDel" title="Ask the BAUKO SPX Bridge extension to fetch delivering data">IMPORT DELIVERING FROM SPX</button>
+<button class="btn s" id="spxAll" title="Fetch inventory and delivering data from SPX">SYNC ALL FROM SPX</button>
 <button class="btn s" id="mDel">Columns</button></div>
 <datalist id="riders"></datalist>
 <div id="delSum" class="mu" style="margin-top:10px">Delivering data not loaded. Import the SPX export for Delivering (Assigned Time = dispatch date).</div></section>
@@ -266,6 +270,48 @@ window.BaukoChecker={receive(msg){
  if(msg.type=='DELIVERING_DATA'){if(msg.riderId)S.rid=String(msg.riderId).trim();load('del',msg.data,'SPX Bridge · delivering');return true}
  return false}};
 addEventListener('message',e=>{if(e.source===window&&e.data)window.BaukoChecker.receive(e.data)});
+
+/* ===== SPX Bridge (Chrome extension) integration via window.postMessage =====
+   The page never touches SPX. It only talks to the BAUKO SPX Bridge extension.
+   Outgoing: {source:"BAUKO_CHECKER", type:"BAUKO_START_INVENTORY_SYNC"|"BAUKO_START_DELIVERING_SYNC"|"BAUKO_START_FULL_SYNC", date, riderId?}
+   Incoming: {source:"BAUKO_SPX_BRIDGE", type:"BAUKO_BRIDGE_READY"|"BAUKO_BRIDGE_PROGRESS"|"BAUKO_BRIDGE_ERROR"|"BAUKO_INVENTORY_DATA"|"BAUKO_DELIVERING_DATA"} */
+(function(){
+ const ISO=/^\d{4}-\d{2}-\d{2}$/;
+ let connected=false,t=null;
+ const getDispatchDate=()=>{const v=($('date')&&$('date').value)||S.date;return ISO.test(v||'')?v:S.date};
+ const getCurrentRiderId=()=>String(($('rid')&&$('rid').value)||S.rid||'').trim();
+ function status(text,cls){const e=$('spxStatus');if(!e)return;e.textContent=text;e.title=text;e.className='spx'+(cls?' '+cls:'')}
+ const ready=()=>{connected=true;status('SPX Bridge: CONNECTED','on')};
+ function send(type,extra){
+  if(!connected)toast('SPX Bridge not detected yet: is the extension installed and enabled on this page?');
+  window.postMessage(Object.assign({source:'BAUKO_CHECKER',type,date:getDispatchDate()},extra||{}),'*');
+  status('SPX Bridge: request sent...','busy')}
+ function needRider(){const r=getCurrentRiderId();if(!r){toast('Enter a Rider ID first');$('rid').focus();return null}return r}
+ $('spxInv').onclick=()=>send('BAUKO_START_INVENTORY_SYNC');
+ $('spxDel').onclick=()=>{const r=needRider();if(r)send('BAUKO_START_DELIVERING_SYNC',{riderId:r})};
+ $('spxAll').onclick=()=>{const r=needRider();if(r)send('BAUKO_START_FULL_SYNC',{riderId:r})};
+ addEventListener('message',e=>{
+  if(e.source!==window||!e.data||e.data.source!=='BAUKO_SPX_BRIDGE')return;
+  const m=e.data;
+  switch(m.type){
+   case 'BAUKO_BRIDGE_READY':ready();break;
+   case 'BAUKO_BRIDGE_PROGRESS':connected=true;status('SPX Bridge: '+(m.message||'Working...'),'busy');break;
+   case 'BAUKO_BRIDGE_ERROR':status('SPX Bridge: '+(m.message||m.error||'Error'),'bad');toast(m.message||m.error||'SPX Bridge error');break;
+   case 'BAUKO_INVENTORY_DATA':
+    connected=true;
+    if(!Array.isArray(m.data)||!m.data.length){status('SPX Bridge: inventory returned no rows','bad');toast('SPX returned no inventory rows');break}
+    window.BaukoChecker.receive({type:'INVENTORY_DATA',date:m.date,data:m.data});
+    status('SPX Bridge: inventory received ('+m.data.length+' rows)','on');break;
+   case 'BAUKO_DELIVERING_DATA':
+    connected=true;
+    if(!Array.isArray(m.data)||!m.data.length){status('SPX Bridge: delivering returned no rows','bad');toast('SPX returned no delivering rows');break}
+    window.BaukoChecker.receive({type:'DELIVERING_DATA',date:m.date,riderId:m.riderId,data:m.data});
+    status('SPX Bridge: delivering received ('+m.data.length+' rows)','on');break;
+  }});
+ /* Handshake: lets an already-loaded extension announce itself even if its READY fired before this page was listening. */
+ window.postMessage({source:'BAUKO_CHECKER',type:'BAUKO_CHECKER_READY'},'*');
+ t=setTimeout(()=>{if(!connected)status('SPX Bridge: NOT DETECTED','bad')},6000);
+})();
 
 
 /* ===== Rider Towns tab ===== */
