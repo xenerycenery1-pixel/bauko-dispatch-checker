@@ -42,6 +42,9 @@ th{position:sticky;top:0;background:var(--hl);cursor:pointer;user-select:none;fo
 dialog{border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);max-width:560px;width:92%}
 #toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:99px;display:none;z-index:9}
 .mu{color:var(--mu)}
+:root{color-scheme:light dark}:root[data-theme="light"]{color-scheme:light}:root[data-theme="dark"]{color-scheme:dark}
+.sc,.tw{scrollbar-width:thin;scrollbar-color:var(--mu) var(--hl)}
+#vp{max-height:min(420px,50vh)}#vp td{padding:4px 8px}#vp td:last-child{white-space:normal;min-width:300px}
 </style></head><body>
 <header><div class="brand"><div class="logo">B</div><h1>BAUKO DISPATCH CHECKER<small>Bauko Hub, station 3634</small></h1></div><nav><button class="btn sm" data-tab="check">Dispatch check</button><button class="btn sm s" data-tab="fin">Final result</button><button class="btn sm s" data-tab="rt">Rider towns</button></nav><span id="spxStatus" class="spx" role="status" aria-live="polite">SPX Bridge: CONNECTING...</span><div id="chips"></div><button class="btn sm s" id="theme" title="Switch light or dark">Theme</button></header>
 <main><div id="tc" style="display:grid;gap:14px">
@@ -71,13 +74,13 @@ dialog{border:1px solid var(--bd);border-radius:10px;background:var(--card);colo
 <div id="banner"></div>
 <section class="met" id="met"></section>
 
-<div class="g3">
+<div class="g2">
 <section class="card"><h2>Not delivering</h2>
 <div class="row" style="margin-bottom:8px"><button class="btn sm" id="cp">Copy OIDs</button><button class="btn sm s" id="ex">Export Exceptions</button><span class="mu" id="ndn"></span></div>
 <div class="sc" id="nd"></div></section>
-<section class="card"><h2>Manual validation · town mismatches</h2><div class="sum" id="vsum" style="margin:0 0 8px"></div><div class="sc" id="vp"></div></section>
 <section class="card"><h2>Missing parcels by town / zone</h2><div id="ta" class="g2"></div></section>
 </div>
+<section class="card"><h2>Manual validation · town mismatches</h2><div class="sum" id="vsum" style="margin:0 0 8px"></div><div class="sc" id="vp"></div></section>
 
 <section class="card"><h2>Results</h2>
 <div class="row" style="margin-bottom:10px">
