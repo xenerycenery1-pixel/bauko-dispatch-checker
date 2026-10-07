@@ -4,44 +4,46 @@
 <title>BAUKO DISPATCH CHECKER</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-:root{--bg:#f3f5f7;--card:#fff;--tx:#18222d;--mu:#5d6b7a;--bd:#d8dfe6;--ac:#0b6e4f;--acx:#fff;--ok:#15803d;--bad:#c62828;--warn:#b45309;--inf:#1d4ed8;--err:#7e22ce;--hl:#f0f4f8;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f151b;--card:#18212a;--tx:#e6edf3;--mu:#93a1b0;--bd:#2c3945;--ac:#34d399;--acx:#06281d;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--inf:#7aa7ff;--err:#c4a1ff;--hl:#202c37}}
-:root[data-theme="dark"]{--bg:#0f151b;--card:#18212a;--tx:#e6edf3;--mu:#93a1b0;--bd:#2c3945;--ac:#34d399;--acx:#06281d;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--inf:#7aa7ff;--err:#c4a1ff;--hl:#202c37}
+:root{--bg:#e9edf0;--card:#fbfcfd;--tx:#14202b;--mu:#5a6b7a;--bd:#cfd8df;--ac:#0b6e4f;--acx:#fff;--ok:#15803d;--bad:#c62828;--warn:#b45309;--inf:#1d4ed8;--err:#7e22ce;--hl:#edf1f4;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1119;--card:#121c26;--tx:#e6edf3;--mu:#93a1b0;--bd:#26343f;--ac:#34d399;--acx:#06281d;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--inf:#7aa7ff;--err:#c4a1ff;--hl:#1a2631}}
+:root[data-theme="dark"]{--bg:#0a1119;--card:#121c26;--tx:#e6edf3;--mu:#93a1b0;--bd:#26343f;--ac:#34d399;--acx:#06281d;--ok:#4ade80;--bad:#f87171;--warn:#fbbf24;--inf:#7aa7ff;--err:#c4a1ff;--hl:#1a2631}
 *{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--bd)}
-h1{font-size:18px;margin:0;letter-spacing:.06em}h2{font-size:12px;margin:0 0 10px;letter-spacing:.08em;color:var(--mu);text-transform:uppercase}
-main{max-width:1280px;margin:0 auto;padding:16px;display:grid;gap:14px}
+body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+header{--ok:#4ade80;--bad:#f87171;--inf:#7aa7ff;--mu:#9fb0c0;--bd:#2c3d4e;--tx:#e8eef5;--card:#0f1c2a;--hl:#1a2b3c;--ac:#34d399;--acx:#06281d;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 18px;background:var(--card);color:var(--tx);border-bottom:3px solid var(--ac)}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:32px;height:32px;border-radius:6px;background:var(--ac);color:var(--acx);display:grid;place-items:center;font-weight:900;font-size:16px}
+h1{font-size:15px;margin:0;font-weight:800;letter-spacing:.04em;line-height:1.2}h1 small{display:block;font-size:11px;font-weight:500;color:var(--mu);letter-spacing:0}
+nav{display:flex;gap:2px;background:var(--hl);padding:3px;border-radius:8px}nav .btn{border:0;border-radius:6px;padding:6px 14px}nav .btn.s{background:transparent;color:var(--mu)}nav .btn.s:hover{color:var(--tx)}
+#chips{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+h2{font-size:13px;margin:0 0 10px;font-weight:700;color:var(--tx)}
+main{max-width:1680px;margin:0 auto;padding:12px 16px 40px;display:grid;gap:12px}main>*,.g2>*,.g3>*{min-width:0}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px}
-.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.g2{display:grid;gap:14px;grid-template-columns:1fr 1fr}
-@media(max-width:860px){.g2{grid-template-columns:1fr}}
-label.f{display:grid;gap:3px;font-size:12px;color:var(--mu)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:end}.g2{display:grid;gap:12px;grid-template-columns:1fr 1fr}.g3{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:1250px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:860px){.g2,.g3{grid-template-columns:1fr}header{padding:8px 12px}#chips{margin-left:0}}
+label.f{display:grid;gap:3px;font-size:12px;color:var(--mu)}label.chk{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--mu);cursor:pointer}
 input,select,textarea{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:6px;padding:7px 9px;color-scheme:light dark;max-width:100%}
-.btn{display:inline-block;font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--ac);color:var(--acx);border-radius:6px;padding:8px 14px}
-.btn.s{background:transparent;color:var(--ac)}.btn.sm{padding:4px 10px;font-size:12px}
-.chip{display:inline-block;border:1px solid var(--bd);border-radius:99px;padding:3px 10px;font-size:12px;margin-left:6px;color:var(--mu)}
-.chip.on{color:var(--ok);border-color:var(--ok)}
-.sum{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px;color:var(--mu)}.sum b{color:var(--tx)}
+input:focus-visible,select:focus-visible,.btn:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.btn{display:inline-block;font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--ac);color:var(--acx);border-radius:6px;padding:7px 14px}.btn:hover{filter:brightness(1.1)}
+.btn.s{background:transparent;color:var(--ac)}.btn.s:hover{background:var(--hl);filter:none}.btn.sm{padding:4px 10px;font-size:12px}
+.chip,.spx{display:inline-block;border:1px solid var(--bd);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--mu)}.chip.on,.spx.on{color:var(--ok);border-color:var(--ok)}
+.spx{max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.spx.busy{color:var(--inf);border-color:var(--inf)}.spx.bad{color:var(--bad);border-color:var(--bad)}
+.sum{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:12px;color:var(--mu)}.sum b{color:var(--tx)}
 .tag{padding:1px 7px;border-radius:4px;background:var(--hl);font-size:12px;margin:2px 4px 0 0;display:inline-block}
 .banner{padding:12px 14px;border-radius:8px;font-weight:700;border:2px solid var(--bad);color:var(--bad)}.banner.i{border-color:var(--inf);color:var(--inf);font-weight:500}
-.met{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
-.m{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 14px}.m small{color:var(--mu);font-size:11px;letter-spacing:.06em}.m div{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
-.sc{max-height:300px;overflow:auto}.tw{overflow-x:auto;max-height:560px;overflow-y:auto}
-table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 9px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}
-th{position:sticky;top:0;background:var(--hl);cursor:pointer;user-select:none;font-size:12px}
+.met{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:1px;background:var(--bd);border:1px solid var(--bd);border-radius:10px;overflow:hidden}
+.m{background:var(--card);padding:10px 14px;border-top:3px solid transparent}.m small{display:block;color:var(--mu);font-size:12px;text-transform:lowercase}.m small::first-letter{text-transform:uppercase}
+.m div{font-size:clamp(22px,2.4vw,32px);font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2}
+.m[data-c=ok]{border-top-color:var(--ok)}.m[data-c=bad]{border-top-color:var(--bad)}.m[data-c=warn]{border-top-color:var(--warn)}.m[data-c=inf]{border-top-color:var(--inf)}
+.sc{max-height:min(320px,42vh);overflow:auto}.tw{overflow:auto;max-height:min(640px,70vh)}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:5px 9px;text-align:left;border-bottom:1px solid var(--bd);white-space:nowrap}tbody tr:hover td,tr:hover>td{background:var(--hl)}
+th{position:sticky;top:0;background:var(--hl);cursor:pointer;user-select:none;font-size:12px;color:var(--mu)}
 .r{font-weight:700;font-size:12px}.MATCHED{color:var(--ok)}.NOTD{color:var(--bad)}.WRONG,.DUP{color:var(--warn)}.NOTI{color:var(--inf)}.ERR{color:var(--err)}
 .bar{display:grid;grid-template-columns:90px 1fr 32px;gap:8px;align-items:center;margin:4px 0}.bar i{display:block;height:10px;background:var(--bad);border-radius:3px}
+.pb{display:inline-block;width:60px;height:6px;background:var(--hl);border-radius:3px;vertical-align:middle}.pb i{display:block;height:100%;background:var(--ok);border-radius:3px}
 dialog{border:1px solid var(--bd);border-radius:10px;background:var(--card);color:var(--tx);max-width:560px;width:92%}
-#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:99px;display:none}
+#toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:8px 16px;border-radius:99px;display:none;z-index:9}
 .mu{color:var(--mu)}
-main{max-width:none;padding:10px;gap:10px}main>*,.g2>*,.g3>*{min-width:0}body{font-size:13px;overflow-x:hidden}
-.g3{display:grid;gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}.g2{gap:10px}
-@media(max-width:1250px){.g3{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:860px){.g3{grid-template-columns:1fr}header{padding:8px 12px}}
-.sc{max-height:min(320px,42vh)}.tw{max-height:min(640px,70vh)}.m{padding:8px 12px}.m div{font-size:clamp(20px,2.3vw,30px)}.met{grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px}
-.spx{display:inline-block;border:1px solid var(--bd);border-radius:99px;padding:3px 10px;font-size:12px;color:var(--mu);max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}.spx.on{color:var(--ok);border-color:var(--ok)}.spx.busy{color:var(--inf);border-color:var(--inf)}.spx.bad{color:var(--bad);border-color:var(--bad)}
-.card{padding:12px}th,td{padding:5px 8px}#chips{display:flex;flex-wrap:wrap;gap:4px}.chip{margin-left:0}
 </style></head><body>
-<header><h1>BAUKO DISPATCH CHECKER</h1><nav><button class="btn sm" data-tab="check">Dispatch Check</button> <button class="btn sm s" data-tab="rt">Rider Towns</button></nav><span id="spxStatus" class="spx" role="status" aria-live="polite">SPX Bridge: CONNECTING...</span><div id="chips"></div></header>
+<header><div class="brand"><div class="logo">B</div><h1>BAUKO DISPATCH CHECKER<small>Bauko Hub, station 3634</small></h1></div><nav><button class="btn sm" data-tab="check">Dispatch check</button><button class="btn sm s" data-tab="fin">Final result</button><button class="btn sm s" data-tab="rt">Rider towns</button></nav><span id="spxStatus" class="spx" role="status" aria-live="polite">SPX Bridge: CONNECTING...</span><div id="chips"></div><button class="btn sm s" id="theme" title="Switch light or dark">Theme</button></header>
 <main><div id="tc" style="display:grid;gap:14px">
 <div class="g2">
 <section class="card"><h2>1 · Dispatch setup</h2>
@@ -50,7 +52,7 @@ main{max-width:none;padding:10px;gap:10px}main>*,.g2>*,.g3>*{min-width:0}body{fo
 <label class="btn">IMPORT INVENTORY<input type="file" id="fInv" accept=".csv,.txt,.xlsx,.xls" hidden></label>
 <button class="btn s" id="spxInv" title="Ask the BAUKO SPX Bridge extension to fetch inventory">IMPORT FROM SPX</button>
 <button class="btn s" id="mInv">Columns</button>
-<button class="btn s" id="clr">Clear all</button></div>
+<label class="chk"><input type="checkbox" id="rep"> Replace existing data on import</label><button class="btn s" id="clr">Clear all</button></div>
 <div id="invSum" class="mu" style="margin-top:10px">Inventory not loaded. Import the SPX export for LMHub_Received / Assigned / Assigning.</div></section>
 
 <section class="card"><h2>2 · Rider check</h2>
@@ -87,6 +89,9 @@ main{max-width:none;padding:10px;gap:10px}main>*,.g2>*,.g3>*{min-width:0}body{fo
 <span class="mu" id="rc"></span></div>
 <div class="tw" id="tb"></div></section>
 </div>
+<div id="tf" style="display:none;gap:12px"><section class="met" id="fmet"></section>
+<section class="card"><h2>Final result, all riders</h2><div class="row" style="margin-bottom:8px"><button class="btn sm" id="fcp">Copy not-dispatched OIDs</button><button class="btn sm s" id="fex">Export final report</button><span class="mu" id="fnote"></span></div><div class="tw" id="frt"></div></section>
+<section class="card"><h2>Not dispatched: in inventory, no rider delivering</h2><div class="tw" id="fnd"></div></section></div>
 <div id="tr" style="display:none;gap:14px">
 <section class="card"><h2>Rider Town IDs · handled towns per rider</h2>
 <p class="mu" style="margin-top:0">Enter the Town Names each rider handles (comma-separated, matched ignoring case/spaces). Saved in this browser; edit any time. The Dispatch Check uses these to decide each rider's expected parcels.</p>
@@ -137,8 +142,8 @@ function validate(recs,kind){const cnt={};recs.forEach(r=>{const f=r.flags=[];
  else if(r.status.toLowerCase()!='delivering')f.push('Unexpected status')});return recs}
 
 const DK=()=>'bauko.data.'+S.date;
-function persist(){const c=k=>S[k]?{n:S[k].name,r:S[k].recs.map(r=>F.map(f=>r[f]))}:null;sv(DK(),{inv:c('inv'),del:c('del')})}
-function restore(){const d=ls(DK(),{});['inv','del'].forEach(k=>{const x=d[k];S[k]=x?{name:x.n,raw:[],map:{},recs:validate(x.r.map((a,i)=>{const o={_row:i+2};F.forEach((f,j)=>o[f]=a[j]);return o}),k)}:null})}
+function persist(){const c=k=>S[k]?{n:S[k].name,i:S[k].imp||[],r:S[k].recs.map(r=>F.map(f=>r[f]))}:null;sv(DK(),{inv:c('inv'),del:c('del')})}
+function restore(){const d=ls(DK(),{});['inv','del'].forEach(k=>{const x=d[k];S[k]=x?{name:x.n,imp:x.i||[],raw:[],map:{},recs:validate(x.r.map((a,i)=>{const o={_row:i+2};F.forEach((f,j)=>o[f]=a[j]);return o}),k)}:null})}
 function prune(){try{const lim=iso(new Date(Date.now()-7*864e5));Object.keys(localStorage).forEach(k=>{const m=k.match(/^bauko\.(data|vd)\.(\d{4}-\d{2}-\d{2})$/);if(m&&m[2]<lim)localStorage.removeItem(k)})}catch(e){}}
 function load(kind,raw,name,map){
  if(!raw.length){toast('No rows found in file');return}
@@ -146,8 +151,15 @@ function load(kind,raw,name,map){
  S.pend[kind]={raw,cols,name,map:map||autoMap(cols)};
  const need=kind=='inv'?['orderId']:['orderId','driverId'];
  if(need.some(f=>!S.pend[kind].map[f]))openMap(kind);else commit(kind)}
-function commit(kind){const p=S.pend[kind];S[kind]={name:p.name,raw:p.raw,map:p.map,recs:validate(normalize(p.raw,p.map),kind)};persist();
- render()}
+function commit(kind){const p=S.pend[kind],ex=S[kind],rp=$('rep').checked,H=HUB.toLowerCase();
+ let recs=normalize(p.raw,p.map);const n=recs.length,xs={};let x=0;
+ if(kind=='inv')recs=recs.filter(r=>{const c=r.currentStation.toLowerCase()==H,e=!p.map.destinationStation||r.destinationStation.toLowerCase()==H;if(c&&e)return true;x++;const w=!c?'Current '+(r.currentStation||'blank'):'Destination '+(r.destinationStation||'blank');xs[w]=(xs[w]||0)+1;return false});
+ const base=rp||!ex?[]:ex.recs,key=r=>kind=='del'?r.orderId+'|'+r.driverId:r.orderId,idx=new Map(),out=base.slice();let a=0,d=0;
+ base.forEach(r=>{if(r.orderId)idx.set(key(r),r)});
+ recs.forEach(r=>{const o=r.orderId&&idx.get(key(r));if(o){d++;F.forEach(f=>{if(!o[f]&&r[f])o[f]=r[f]})}else{if(r.orderId)idx.set(key(r),r);out.push(r);a++}});
+ const t=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),imp=(rp||!ex?[]:ex.imp||[]).concat([{t,n,a,d,x,xs,nd:kind=='inv'&&!p.map.destinationStation}]);
+ S[kind]={name:p.name,imp,raw:[],map:p.map,recs:validate(out,kind)};persist();
+ toast((rp?'Replaced: ':'Merged: ')+a+' new, '+d+' already present'+(x?', '+x+' excluded':''));render()}
 
 /* ===== Layer 3: matching engine (pure, column-agnostic) ===== */
 function compare(inv,del,rid,scope,towns){
@@ -175,12 +187,12 @@ function compare(inv,del,rid,scope,towns){
 
 /* ===== Layer 4: UI ===== */
 const CLS={'MATCHED':'MATCHED','NOT DELIVERING':'NOTD','WRONG RIDER':'WRONG','DUPLICATE':'DUP','NOT IN INVENTORY':'NOTI','DATA ERROR':'ERR'};
-const GLY={'MATCHED':'✔','NOT DELIVERING':'✖','WRONG RIDER':'⇄','DUPLICATE':'⧉','NOT IN INVENTORY':'?','DATA ERROR':'!'};
+const CC={notDel:'bad',matched:'ok',pct:'ok',wrong:'warn',dup:'warn',notInv:'inf'};const GLY={'MATCHED':'✔','NOT DELIVERING':'✖','WRONG RIDER':'⇄','DUPLICATE':'⧉','NOT IN INVENTORY':'?','DATA ERROR':'!'};
 function summary(d,kind){if(!d)return null;const rs=d.recs,c={},st={};
  rs.forEach(r=>{r.flags.forEach(f=>c[f]=(c[f]||0)+1);const k=(kind=='inv'?r.currentStation:r.driverId)||'(blank)';st[k]=(st[k]||0)+1});
  const valid=new Set(rs.filter(r=>r.orderId).map(r=>r.orderId)).size;
  const other=Object.entries(c).filter(([k])=>!/Missing OID|Duplicate OID/.test(k));
- return`<b>IMPORT COMPLETE</b> · ${esc(d.name)}<div class="sum"><span>Total rows <b>${rs.length.toLocaleString()}</b></span><span>Valid OIDs <b>${valid.toLocaleString()}</b></span><span>Duplicate OIDs <b>${c['Duplicate OID']||0}</b></span><span>Missing OIDs <b>${c['Missing OID']||0}</b></span></div>
+ const im=d.imp||[],l=im[im.length-1];return`<b>Data loaded</b> · ${esc(d.name)}${l?`<div class="sum"><span>Imports merged <b>${im.length}</b></span><span>Last import: <b>+${l.a}</b> new</span><span><b>${l.d}</b> already present</span>${l.x?`<span style="color:var(--warn)"><b>${l.x}</b> excluded (${Object.entries(l.xs).map(([k,v])=>esc(k)+' '+v).join(', ')})</span>`:''}${l.nd?'<span style="color:var(--warn)">No Destination Station column found: only Current Station filtered</span>':''}</div>`:''}<div class="sum"><span>Total rows <b>${rs.length.toLocaleString()}</b></span><span>Valid OIDs <b>${valid.toLocaleString()}</b></span><span>Duplicate OIDs <b>${c['Duplicate OID']||0}</b></span><span>Missing OIDs <b>${c['Missing OID']||0}</b></span></div>
  <div style="margin-top:6px">${kind=='inv'?'Current Station: ':'Rows per Driver ID: '}${Object.entries(st).map(([k,v])=>`<span class="tag">${esc(k)}: <b>${v}</b></span>`).join('')}</div>
  <div style="margin-top:4px">${other.length?other.map(([k,v])=>`<span class="tag" style="color:var(--warn)">${esc(k)}: ${v}</span>`).join(''):'<span class="tag">No other validation issues</span>'}</div>`}
 const riderName=id=>{const r=(S.del&&S.del.recs.find(x=>x.driverId===id&&x.driverName))||(S.inv&&S.inv.recs.find(x=>x.driverId===id&&x.driverName));return r?r.driverName:((S.ro[id]||{}).n||'')};
@@ -204,7 +216,7 @@ function render(){
  else if(R.noData)b.innerHTML='<div class="banner">NO DELIVERING DATA FOUND FOR THIS RIDER<div style="font-weight:400;font-size:13px">Rider '+esc(S.rid)+' has no rows in the imported Delivering dataset. This is NOT treated as zero parcels: check the Rider ID, date and export before concluding.</div></div>';
  else b.innerHTML='';
  const ok=R&&R.rows,m=ok?R.m:null,v=k=>m?(k=='pct'?m.pct.toFixed(2)+'%':m[k].toLocaleString()):'—';
- $('met').innerHTML=[['EXPECTED','expected'],['DELIVERING','delivering'],['MATCHED','matched'],['NOT DELIVERING','notDel'],['WRONG RIDER / EXCEPTION','wrong'],['DUPLICATE OIDS','dup'],['NOT IN INVENTORY','notInv'],['COMPLETION','pct']].map(([l,k])=>`<div class="m"><small>${l}</small><div ${k=='notDel'&&m&&m.notDel?'class="NOTD"':''} style="${k=='notDel'&&m&&m.notDel?'color:var(--bad)':''}">${v(k)}</div></div>`).join('');
+ $('met').innerHTML=[['EXPECTED','expected'],['DELIVERING','delivering'],['MATCHED','matched'],['NOT DELIVERING','notDel'],['WRONG RIDER / EXCEPTION','wrong'],['DUPLICATE OIDS','dup'],['NOT IN INVENTORY','notInv'],['COMPLETION','pct']].map(([l,k])=>`<div class="m" data-c="${CC[k]||''}"><small>${l}</small><div ${k=='notDel'&&m&&m.notDel?'class="NOTD"':''} style="${k=='notDel'&&m&&m.notDel?'color:var(--bad)':''}">${v(k)}</div></div>`).join('');
  const rows=ok?R.rows:[];
  $('fr').innerHTML=opts(rows.map(r=>r.res),'All results')+'<option value="VALIDATE">⚠ Needs validation</option>';$('ft').innerHTML=opts(rows.map(r=>r.town),'All towns');$('fz').innerHTML=opts(rows.map(r=>r.zone),'All zones');
  $('fr').value=S.fr;$('ft').value=S.ft;$('fz').value=S.fz;
@@ -213,7 +225,7 @@ function render(){
  $('nd').innerHTML=!ok?'<span class="mu">Run a rider check to see missing parcels.</span>':nd.length?`<table><tr><th>Order ID</th><th>Town</th><th>Zone</th></tr>${nd.map(r=>`<tr><td><b>${esc(r.oid)}</b></td><td>${esc(r.town)||'—'}</td><td>${esc(r.zone)||'—'}</td></tr>`).join('')}</table>`:'<b class="MATCHED">✔ No missing parcels for this rider.</b>';
  const grp=k=>{const c={};nd.forEach(r=>{const x=r[k]||'(blank)';c[x]=(c[x]||0)+1});const e=Object.entries(c).sort((a,b)=>b[1]-a[1]),mx=e[0]?e[0][1]:1;return e.map(([n,v])=>`<div class="bar"><span>${esc(n)}</span><i style="width:${v/mx*100}%"></i><b>${v}</b></div>`).join('')||'<span class="mu">—</span>'};
  $('ta').innerHTML=`<div><b>Town</b>${grp('town')}</div><div><b>Zone ID</b>${grp('zone')}</div>`;
- vpanel(rows);table(rows);if(S.tab=='rt')renderRT()}
+ vpanel(rows);table(rows);if(S.tab=='rt')renderRT();if(S.tab=='fin')renderFin()}
 
 const vst=o=>S.vd[o]||'';
 function vcell(r){if(!r.chk)return'';const v=vst(r.oid),b=(x,l)=>`<button class="btn sm ${v==x?'':'s'}" data-v="${x}" data-o="${esc(r.oid)}">${l}</button>`;return`<span class="r ${v=='ok'?'MATCHED':v=='issue'?'NOTD':'WRONG'}">${v=='ok'?'✔ validated':v=='issue'?'✖ issue':'⚠ pending'}</span> <span class="mu">${esc(r.chk)}</span> ${b('ok','OK')} ${b('issue','Issue')}${v?b('','Reset'):''}`}
@@ -254,12 +266,12 @@ $('clr').onclick=()=>{if(!confirm('Clear the loaded Inventory and Delivering dat
 function copy(t,msg){const fb=()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast(msg)}catch(e){toast('Copy blocked: select text manually')}a.remove()};
  navigator.clipboard?navigator.clipboard.writeText(t).then(()=>toast(msg),fb):fb()}
 $('cp').onclick=()=>{const l=R&&R.rows?R.rows.filter(r=>r.res=='NOT DELIVERING').map(r=>r.oid):[];l.length?copy(l.join('\n'),l.length+' OIDs copied'):toast('Nothing to copy')};
-$('ex').onclick=()=>{if(!R||!R.rows){toast('Run a rider check first');return}
+$('ex').onclick=()=>{S.dxn='';if(!R||!R.rows){toast('Run a rider check first');return}
  const ex=R.rows.filter(r=>r.res!='MATCHED'),h=['Order ID','Town','Zone','Driver ID','Driver Name','Expected Status','Actual Status','Result','Note'];
  const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
  $('dxt').value=[h.map(q).join(',')].concat(ex.map(r=>[r.oid,r.town,r.zone,r.did,r.dn,r.es,r.as,r.res,r.note].map(q).join(','))).join('\n');$('dx').showModal()};
 $('dxc').onclick=()=>copy($('dxt').value,'CSV copied');$('dxx').onclick=()=>$('dx').close();
-$('dxd').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('dxt').value],{type:'text/csv'}));a.download=`bauko-exceptions-${S.date}-rider${S.rid}.csv`;a.click()}catch(e){toast('Download blocked: use Copy')}};
+$('dxd').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([$('dxt').value],{type:'text/csv'}));a.download=S.dxn||`bauko-exceptions-${S.date}-rider${S.rid}.csv`;a.click()}catch(e){toast('Download blocked: use Copy')}};
 
 /* ===== Future SPX Bridge boundary =====
    window.BaukoChecker.receive({type:"INVENTORY_DATA",date:"YYYY-MM-DD",data:[...]})
@@ -318,6 +330,31 @@ addEventListener('message',e=>{if(e.source===window&&e.data)window.BaukoChecker.
 })();
 
 
+/* ===== Final Result tab (all riders, over merged imports) ===== */
+function calcFinal(){
+ if(!S.inv||!S.del)return null;
+ const inv=S.inv.recs,del=S.del.recs,im=new Map(),dm=new Map();
+ inv.forEach(r=>{if(r.orderId&&!im.has(r.orderId))im.set(r.orderId,r)});
+ del.forEach(r=>{if(!r.orderId)return;if(!dm.has(r.orderId))dm.set(r.orderId,new Set());dm.get(r.orderId).add(r.driverId)});
+ const nd=[...im.values()].filter(r=>!dm.has(r.orderId)),ids=[...new Set(del.map(r=>r.driverId).concat(Object.keys(S.rt)).filter(Boolean))];
+ const rows=ids.map(i=>{const t=new Set((S.rt[i]||[]).map(nk)),sc=S.scope,o={id:i,name:riderName(i)};
+  if(sc=='towns'&&!t.size){o.note='No towns set';o.del=new Set(del.filter(r=>r.driverId===i).map(r=>r.orderId)).size;return o}
+  const c=compare(inv,del,i,sc,t);
+  if(c.noData){const e=new Set(inv.filter(r=>r.orderId&&(sc=='all'||(sc=='towns'?t.has(nk(r.townName)):r.driverId===i))).map(r=>r.orderId)).size;return Object.assign(o,{exp:e,del:0,mat:0,nd:e,wr:0,ni:0,pct:0,note:'No delivering rows'})}
+  const m=c.m;return Object.assign(o,{exp:m.expected,del:m.delivering,mat:m.matched,nd:m.notDel,wr:m.wrong,ni:m.notInv,pct:m.pct})});
+ rows.sort((a,b)=>(b.nd||0)-(a.nd||0)||String(a.id).localeCompare(String(b.id),undefined,{numeric:true}));
+ return{rows,nd,inv:im.size,disp:im.size-nd.length,notInv:[...dm.keys()].filter(o=>!im.has(o)).length,multi:[...dm.values()].filter(v=>v.size>1).length}}
+function renderFin(){
+ const f=S.fin=calcFinal(),v=x=>!f?'—':x=='pct'?(f.inv?f.disp/f.inv*100:0).toFixed(2)+'%':(x=='nd'?f.nd.length:f[x]).toLocaleString();
+ $('fmet').innerHTML=[['Inventory parcels','inv',''],['Dispatched','disp','ok'],['Not dispatched','nd','bad'],['Delivering, not in inventory','notInv','inf'],['OIDs under 2+ drivers','multi','warn'],['Dispatch rate','pct','ok']].map(([l,x,c])=>`<div class="m" data-c="${c}"><small>${l}</small><div>${v(x)}</div></div>`).join('');
+ $('frt').innerHTML=!f?'<span class="mu">Import Inventory and Delivering data first.</span>':`<table><tr><th>Rider ID</th><th>Name</th><th>Expected</th><th>Delivering</th><th>Matched</th><th>Not delivering</th><th>Wrong rider</th><th>Not in inv.</th><th>Completion</th><th>Note</th><th></th></tr>${f.rows.map(r=>`<tr><td><b>${esc(r.id)}</b></td><td>${esc(r.name)||'—'}</td><td>${r.exp??'—'}</td><td>${r.del??'—'}</td><td>${r.mat??'—'}</td><td class="${r.nd?'NOTD r':''}">${r.nd??'—'}</td><td>${r.wr??'—'}</td><td>${r.ni??'—'}</td><td>${r.pct==null?'—':'<span class="pb"><i style="width:'+Math.min(100,r.pct)+'%"></i></span> '+r.pct.toFixed(1)+'%'}</td><td class="mu">${esc(r.note||'')}</td><td><button class="btn sm s" data-open="${esc(r.id)}">Open</button></td></tr>`).join('')}</table>`;
+ $('fnd').innerHTML=!f?'':f.nd.length?`<table><tr><th>Order ID</th><th>Town</th><th>Zone</th><th>Inventory status</th><th>Assigned driver</th></tr>${f.nd.slice(0,2000).map(r=>`<tr><td><b>${esc(r.orderId)}</b></td><td>${esc(r.townName)||'—'}</td><td>${esc(r.zoneId)||'—'}</td><td>${esc(r.status)}</td><td>${esc(r.driverId)||'—'}</td></tr>`).join('')}</table>`+(f.nd.length>2000?'<p class="mu">Showing 2000 of '+f.nd.length+'. Export for the full list.</p>':''):'<b class="MATCHED">✔ Every inventory parcel was dispatched.</b>';
+ $('fnote').textContent=f?'Built from all merged imports. Scope: '+$('scope').selectedOptions[0].text:''}
+$('fcp').onclick=()=>{const l=S.fin?S.fin.nd.map(r=>r.orderId):[];l.length?copy(l.join('\n'),l.length+' OIDs copied'):toast('Nothing to copy')};
+$('fex').onclick=()=>{const f=S.fin;if(!f){toast('Import data first');return}const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"',L=a=>a.map(q).join(',');
+ const t=[L(['Rider ID','Rider Name','Expected','Delivering','Matched','Not Delivering','Wrong Rider','Not In Inventory','Completion %','Note'])].concat(f.rows.map(r=>L([r.id,r.name,r.exp,r.del,r.mat,r.nd,r.wr,r.ni,r.pct==null?'':r.pct.toFixed(2),r.note||'']))).concat(['',L(['NOT DISPATCHED']),L(['Order ID','Town','Zone','Status','Assigned Driver'])]).concat(f.nd.map(r=>L([r.orderId,r.townName,r.zoneId,r.status,r.driverId])));
+ S.dxn='bauko-final-'+S.date+'.csv';$('dxt').value=t.join('\n');$('dx').showModal()};
+
 /* ===== Rider Towns tab ===== */
 const parseT=t=>[...new Set(t.split(/[,;\n]/).map(x=>x.trim()).filter(Boolean))],saveRT=()=>sv('bauko.rt',S.rt);
 function renderRT(){
@@ -331,7 +368,7 @@ function renderRT(){
  $('tgt').innerHTML=ids.map(i=>`<option ${i==S.tgt?'selected':''}>${esc(i)}</option>`).join('');
  const un=Object.entries(cnt).filter(([t])=>!own[nk(t)]).sort((a,b)=>b[1]-a[1]);
  $('un').innerHTML=(S.inv?(un.length?un.map(([t,n])=>`<button class="tag" style="cursor:pointer;border:1px solid var(--bd);color:var(--tx)" data-add="${esc(t)}">${esc(t)} (${n})</button>`).join(''):'<span class="MATCHED r">✔ Every inventory town is assigned to a rider.</span>')+(blank?`<p class="WRONG">${blank} inventory row(s) have no Town Name and are excluded from town-based expected lists.</p>`:''):'<span class="mu">Import Inventory to see unassigned towns.</span>')}
-function tab(t){S.tab=t;$('tc').style.display=t=='rt'?'none':'grid';$('tr').style.display=t=='rt'?'grid':'none';document.querySelectorAll('nav [data-tab]').forEach(b=>b.classList.toggle('s',b.dataset.tab!=t));if(t=='rt')renderRT()}
+function tab(t){S.tab=t;$('tc').style.display=t=='check'?'grid':'none';$('tf').style.display=t=='fin'?'grid':'none';$('tr').style.display=t=='rt'?'grid':'none';document.querySelectorAll('nav [data-tab]').forEach(b=>b.classList.toggle('s',b.dataset.tab!=t));if(t=='rt')renderRT();if(t=='fin')renderFin()}
 $('rtt').onchange=e=>{const i=e.target.dataset.rt;if(i===undefined)return;S.rt[i]=parseT(e.target.value);saveRT();render();renderRT()};
 $('rtt').onclick=e=>{const i=e.target.dataset.rdel;if(i===undefined||!confirm('Remove rider '+i+' and their towns?'))return;delete S.rt[i];saveRT();render();renderRT()};
 $('un').onclick=e=>{const t=e.target.dataset.add;if(t===undefined||!S.tgt)return toast('Add a rider first');S.rt[S.tgt].push(t);saveRT();render();renderRT()};
@@ -345,7 +382,9 @@ $('fRo').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)re
 $('tgt').onchange=e=>S.tgt=e.target.value;
 $('nradd').onclick=()=>{const i=$('nrid').value.trim();if(!i)return;if(!S.rt[i])S.rt[i]=[];$('nrid').value='';S.tgt=i;saveRT();render();renderRT()};
 document.addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t)return tab(t.dataset.tab);
+ const op=e.target.closest('[data-open]');if(op){S.rid=op.dataset.open;tab('check');render();return}
  const b=e.target.closest('[data-v]');if(!b)return;const o=b.dataset.o,v=b.dataset.v;if(v)S.vd[o]=v;else delete S.vd[o];sv('bauko.vd.'+S.date,S.vd);
  const a=$('tb').scrollTop,c=$('vp').scrollTop;render();$('tb').scrollTop=a;$('vp').scrollTop=c});
+(function(){const r=document.documentElement,k='bauko.theme';let t=ls(k,'');if(t)r.dataset.theme=t;$('theme').onclick=()=>{const dk=(r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'))=='dark';t=dk?'light':'dark';r.dataset.theme=t;sv(k,t)}})();
 prune();restore();render();
 </script></body></html>
