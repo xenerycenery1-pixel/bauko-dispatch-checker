@@ -124,6 +124,8 @@ async function readFile(f){
  if(!window.XLSX)throw new Error('XLSX reader not loaded (needs internet once). Use CSV instead.');
  const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});return XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:'',raw:false})}
 
+function csvObjects(t){const rows=csv(String(t).replace(/^\uFEFF/,'')).filter(r=>r.some(x=>x.trim()));const h=(rows[0]||[]).map(x=>x.trim());return rows.slice(1).map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]??''])))}
+
 /* ===== Layer 2: normalization & validation ===== */
 function autoMap(cols){const m={};F.forEach(f=>{const a=AL[f].map(nk);m[f]=cols.find(c=>a.includes(nk(c)))||''});return m}
 function normalize(raw,map){return raw.map((r,i)=>{const o={_row:i+2};F.forEach(f=>o[f]=map[f]?String(r[map[f]]??'').trim():'');o.orderId=o.orderId.toUpperCase();if(/^0+$/.test(o.driverId))o.driverId='';return o})}
@@ -287,26 +289,28 @@ addEventListener('message',e=>{if(e.source===window&&e.data)window.BaukoChecker.
   window.postMessage(Object.assign({source:'BAUKO_CHECKER',type,date:getDispatchDate()},extra||{}),'*');
   status('SPX Bridge: request sent...','busy')}
  function needRider(){const r=getCurrentRiderId();if(!r){toast('Enter a Rider ID first');$('rid').focus();return null}return r}
+ const bridgeRows=m=>{try{return Array.isArray(m.data)?m.data:(typeof m.csvText==='string'?csvObjects(m.csvText):[])}catch(e){return[]}};
  $('spxInv').onclick=()=>send('BAUKO_START_INVENTORY_SYNC');
- $('spxDel').onclick=()=>{const r=needRider();if(r)send('BAUKO_START_DELIVERING_SYNC',{riderId:r})};
- $('spxAll').onclick=()=>{const r=needRider();if(r)send('BAUKO_START_FULL_SYNC',{riderId:r})};
+ $('spxDel').onclick=()=>send('BAUKO_START_DELIVERING_SYNC',{riderId:getCurrentRiderId()||null});
+ $('spxAll').onclick=()=>send('BAUKO_START_FULL_SYNC',{riderId:getCurrentRiderId()||null});
  addEventListener('message',e=>{
   if(e.source!==window||!e.data||e.data.source!=='BAUKO_SPX_BRIDGE')return;
   const m=e.data;
   switch(m.type){
    case 'BAUKO_BRIDGE_READY':ready();break;
+   case 'BAUKO_BRIDGE_DISCONNECTED':connected=false;status('SPX Bridge: disconnected - '+(m.message||'refresh this page (F5)'),'bad');break;
    case 'BAUKO_BRIDGE_PROGRESS':connected=true;status('SPX Bridge: '+(m.message||'Working...'),'busy');break;
    case 'BAUKO_BRIDGE_ERROR':status('SPX Bridge: '+(m.message||m.error||'Error'),'bad');toast(m.message||m.error||'SPX Bridge error');break;
-   case 'BAUKO_INVENTORY_DATA':
-    connected=true;
-    if(!Array.isArray(m.data)||!m.data.length){status('SPX Bridge: inventory returned no rows','bad');toast('SPX returned no inventory rows');break}
-    window.BaukoChecker.receive({type:'INVENTORY_DATA',date:m.date,data:m.data});
-    status('SPX Bridge: inventory received ('+m.data.length+' rows)','on');break;
-   case 'BAUKO_DELIVERING_DATA':
-    connected=true;
-    if(!Array.isArray(m.data)||!m.data.length){status('SPX Bridge: delivering returned no rows','bad');toast('SPX returned no delivering rows');break}
-    window.BaukoChecker.receive({type:'DELIVERING_DATA',date:m.date,riderId:m.riderId,data:m.data});
-    status('SPX Bridge: delivering received ('+m.data.length+' rows)','on');break;
+   case 'BAUKO_INVENTORY_DATA':{
+    connected=true;const rows=bridgeRows(m);
+    if(!rows.length){status('SPX Bridge: inventory returned no rows','bad');toast('SPX returned no inventory rows');break}
+    window.BaukoChecker.receive({type:'INVENTORY_DATA',date:m.date,data:rows});
+    status('SPX Bridge: inventory received ('+rows.length+' rows)','on');break}
+   case 'BAUKO_DELIVERING_DATA':{
+    connected=true;const rows=bridgeRows(m);
+    if(!rows.length){status('SPX Bridge: delivering returned no rows','bad');toast('SPX returned no delivering rows');break}
+    window.BaukoChecker.receive({type:'DELIVERING_DATA',date:m.date,riderId:m.riderId,data:rows});
+    status('SPX Bridge: delivering received ('+rows.length+' rows)','on');break}
   }});
  /* Handshake: lets an already-loaded extension announce itself even if its READY fired before this page was listening. */
  window.postMessage({source:'BAUKO_CHECKER',type:'BAUKO_CHECKER_READY'},'*');
