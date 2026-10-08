@@ -52,6 +52,7 @@ dialog{border:1px solid var(--bd);border-radius:10px;background:var(--card);colo
 <section class="card"><h2>1 · Dispatch setup</h2>
 <div class="row">
 <label class="f">Dispatch Date<input type="date" id="date"></label>
+<label class="f">Station ID<input type="number" id="stationId" inputmode="numeric" min="1" step="1" placeholder="e.g. 3634" title="SPX station ID to pull data for. Leave blank to use your SPX account's own station." style="width:110px"></label>
 <label class="btn">IMPORT INVENTORY<input type="file" id="fInv" accept=".csv,.txt,.xlsx,.xls" hidden></label>
 <button class="btn s" id="spxInv" title="Ask the BAUKO SPX Bridge extension to fetch inventory">IMPORT FROM SPX</button>
 <button class="btn s" id="mInv">Columns</button>
@@ -299,10 +300,20 @@ addEventListener('message',e=>{if(e.source===window&&e.data)window.BaukoChecker.
  const getCurrentRiderId=()=>String(($('rid')&&$('rid').value)||S.rid||'').trim();
  function status(text,cls){const e=$('spxStatus');if(!e)return;e.textContent=text;e.title=text;e.className='spx'+(cls?' '+cls:'')}
  const ready=()=>{connected=true;status('SPX Bridge: CONNECTED','on')};
+ const LS_ST='bauko_station_id_v1';
+ let bridgeVer='';
+ /* positive integer | null when blank | false when invalid */
+ function stationValue(){const e=$('stationId');const raw=String((e&&e.value)||'').trim();if(!raw)return null;const n=Number(raw);return Number.isInteger(n)&&n>0?n:false}
+ function bridgeAtLeast(a,b){const v=String(bridgeVer||'').split('.').map(Number);return v[0]>a||(v[0]===a&&v[1]>=b)}
+ try{const ss=localStorage.getItem(LS_ST);if(ss&&$('stationId'))$('stationId').value=ss}catch(e){}
+ if($('stationId'))$('stationId').addEventListener('input',()=>{try{localStorage.setItem(LS_ST,$('stationId').value.trim())}catch(e){}});
  function send(type,extra){
+  const st=stationValue();
+  if(st===false){toast('Station ID must be a whole number, e.g. 3634');$('stationId').focus();return}
+  if(st&&connected&&!bridgeAtLeast(2,4)){toast('Update the BAUKO SPX BRIDGE extension to v2.4 or newer to choose a station (it is v'+(bridgeVer||'?')+')');return}
   if(!connected)toast('SPX Bridge not detected yet: is the extension installed and enabled on this page?');
-  window.postMessage(Object.assign({source:'BAUKO_CHECKER',type,date:getDispatchDate()},extra||{}),'*');
-  status('SPX Bridge: request sent...','busy')}
+  window.postMessage(Object.assign({source:'BAUKO_CHECKER',type,date:getDispatchDate(),stationId:st||null},extra||{}),'*');
+  status('SPX Bridge: request sent'+(st?' (station '+st+')':'')+'...','busy')}
  function needRider(){const r=getCurrentRiderId();if(!r){toast('Enter a Rider ID first');$('rid').focus();return null}return r}
  const bridgeRows=m=>{try{return Array.isArray(m.data)?m.data:(typeof m.csvText==='string'?csvObjects(m.csvText):[])}catch(e){return[]}};
  $('spxInv').onclick=()=>send('BAUKO_START_INVENTORY_SYNC');
@@ -312,7 +323,7 @@ addEventListener('message',e=>{if(e.source===window&&e.data)window.BaukoChecker.
   if(e.source!==window||!e.data||e.data.source!=='BAUKO_SPX_BRIDGE')return;
   const m=e.data;
   switch(m.type){
-   case 'BAUKO_BRIDGE_READY':ready();break;
+   case 'BAUKO_BRIDGE_READY':if(m.version)bridgeVer=m.version;ready();break;
    case 'BAUKO_BRIDGE_DISCONNECTED':connected=false;status('SPX Bridge: disconnected - '+(m.message||'refresh this page (F5)'),'bad');break;
    case 'BAUKO_BRIDGE_PROGRESS':connected=true;status('SPX Bridge: '+(m.message||'Working...'),'busy');break;
    case 'BAUKO_BRIDGE_ERROR':status('SPX Bridge: '+(m.message||m.error||'Error'),'bad');toast(m.message||m.error||'SPX Bridge error');break;
